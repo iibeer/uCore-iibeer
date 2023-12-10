@@ -28,7 +28,7 @@ int main()
 	assert(0 == info.syscall_times[SYSCALL_WRITE]);
 	assert(0 < info.syscall_times[SYSCALL_YIELD]);
 	assert(0 == info.syscall_times[SYSCALL_EXIT]);
-	//assert(t2 - t1 <= info.time);
+	assert(t2 - t1 <= info.time);
 	assert(info.time < t3 - t1 + 100);
 	assert(Running == info.status);
 

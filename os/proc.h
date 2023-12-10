@@ -1,6 +1,7 @@
 #ifndef PROC_H
 #define PROC_H
 
+#include "riscv.h"
 #include "types.h"
 
 #define NPROC (16)
@@ -27,38 +28,24 @@ struct context {
 
 enum procstate { UNUSED, USED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
-#define MAX_SYSCALL_NUM 500
 // Per-process state
 struct proc {
 	enum procstate state; // Process state
 	int pid; // Process ID
-	uint64 ustack; // Virtual address of user stack
+	pagetable_t pagetable; // User page table
+	uint64 ustack;
 	uint64 kstack; // Virtual address of kernel stack
 	struct trapframe *trapframe; // data page for trampoline.S
 	struct context context; // swtch() here to run process
+	uint64 max_page;
 	/*
 	* LAB1: you may need to add some new fields here
 	*/
-	uint64 start_cycle;
-	unsigned int syscall_times[MAX_SYSCALL_NUM];
 };
 
 /*
 * LAB1: you may need to define struct for TaskInfo here
 */
-// Be consistent with user mode
-typedef enum {
-	UnInit,
-	Ready,
-	Running,
-	Exited,
-} TaskStatus;
-
-typedef struct {
-	TaskStatus state;
-	unsigned int syscall_times[MAX_SYSCALL_NUM];
-	int time;
-} TaskInfo;
 
 struct proc *curr_proc();
 void exit(int);
