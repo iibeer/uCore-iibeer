@@ -47,6 +47,80 @@ uint64 sys_gettimeofday(uint64 va, int _tz) // TODO: implement sys_gettimeofday 
 // TODO: add support for mmap and munmap syscall.
 // hint: read through docstrings in vm.c. Watching CH4 video may also help.
 // Note the return value and PTE flags (especially U,X,W,R)
+int sys_mmap(uint64 va, unsigned long long len, int port, int flag, int fd) {
+	if (len == 0) {
+		return 0;
+	}
+	if (len > 1024 * 1024 * 1024) {
+		errorf("sys_mmap: the maxinum len is 1G");
+		return -1;
+	}
+	if ((va & (PAGE_SIZE - 1)) !=0 ) {
+		errorf("start address must be aligned to page size");
+		return -1;
+	}
+	if ((port & ~0x7) != 0 || (port & 0x7) == 0) {
+		errorf("not allow port: 0x%x", port);
+		return -1;
+	}
+
+	struct proc *p = curr_proc();
+	int perm = (port << 1) | PTE_U;
+	uint32 page_num = (len + PAGE_SIZE - 1) / PAGE_SIZE;
+	for (uint32 i = 0; i < page_num; i++) {
+		uint64 pa;
+		if ((pa = (uint64)kalloc()) <= 0) {
+			errorf("sys_mmap: kalloc physical page failed");
+			return -1;
+		}
+		if (mappages(p->pagetable, va + PAGE_SIZE * i,
+				PAGE_SIZE, pa, perm) != 0) {
+			errorf("sys_mmap: mappages failed");
+			return -1;
+		}
+	}
+	return 0;
+} 
+
+extern pte_t *walk(pagetable_t, uint64, int);
+int sys_munmap(uint64 va, unsigned long long len) {
+	if (len == 0) {
+		return 0;
+	}
+	if (len > 1024 * 1024 * 1024) {
+		errorf("sys_mmap: the maxinum len is 1G");
+		return -1;
+	}
+	if ((va & (PAGE_SIZE - 1)) !=0 ) {
+		errorf("start address must be aligned to page size");
+		return -1;
+	}
+
+	struct proc *p = curr_proc();
+	uint32 page_num = (len + PAGE_SIZE - 1) / PAGE_SIZE;
+	
+	pte_t *pte;
+	for (uint8 i = 0; i < page_num; i++) {
+		if ((pte = walk(p->pagetable, va + i * PAGE_SIZE, 0)) == 0) {
+			errorf("virtual address: 0x%x not have PTE", va + i * PAGE_SIZE);
+			return -1;
+		}
+		if ((*pte & PTE_V) == 0) {
+			errorf("virtual address: 0x%x PTE no mapping Physical address", va + i * PAGE_SIZE);
+			return -1;
+		}
+		if ((*pte & PTE_V) != 0) {
+			if (PTE_FLAGS(*pte) == PTE_V)
+				panic("uvmunmap: not a leaf");
+			uint64 pa = PTE2PA(*pte);
+			kfree((void *)pa);
+		}
+		*pte = 0;
+	}
+
+	return 0;
+}
+
 /*
 * LAB1: you may need to define sys_task_info here
 */
@@ -103,6 +177,12 @@ void syscall()
 	*/
 	case SYS_task_info:
 		ret = sys_task_info(args[0]);
+		break;
+	case SYS_mmap:
+		ret = sys_mmap(args[0], args[1], args[2], args[3], args[4]);
+		break;
+	case SYS_munmap:
+		ret = sys_munmap(args[0], args[1]);
 		break;
 	default:
 		ret = -1;
