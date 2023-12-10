@@ -32,17 +32,15 @@ uint64 sys_sched_yield()
 	return 0;
 }
 
-uint64 sys_gettimeofday(TimeVal *val, int _tz) // TODO: implement sys_gettimeofday in pagetable. (VA to PA)
+uint64 sys_gettimeofday(uint64 va, int _tz) // TODO: implement sys_gettimeofday in pagetable. (VA to PA)
 {
 	// YOUR CODE
-	val->sec = 0;
-	val->usec = 0;
-
-	/* The code in `ch3` will leads to memory bugs*/
-
-	// uint64 cycle = get_cycle();
-	// val->sec = cycle / CPU_FREQ;
-	// val->usec = (cycle % CPU_FREQ) * 1000000 / CPU_FREQ;
+	struct proc *p = curr_proc();
+	TimeVal val;
+	uint64 cycle = get_cycle();
+	val.sec = cycle / CPU_FREQ;
+	val.usec = (cycle % CPU_FREQ) * 1000000 / CPU_FREQ;
+	copyout(p->pagetable, va, (char *)&val, sizeof(val));
 	return 0;
 }
 
@@ -52,12 +50,26 @@ uint64 sys_gettimeofday(TimeVal *val, int _tz) // TODO: implement sys_gettimeofd
 /*
 * LAB1: you may need to define sys_task_info here
 */
+uint64 sys_task_info(uint64 va) {
+	struct proc *p = curr_proc();
+	uint64 curr_cycle = get_cycle();
+	debugf("curr_cycle = %d, start_cycle = %d", curr_cycle, p->start_cycle);
+	TaskInfo ti;
+	ti.state = Running;
+	ti.time = (curr_cycle - p->start_cycle) * 1000000 / CPU_FREQ / 1000;
+	for(uint32 i = 0; i < MAX_SYSCALL_NUM; i++) {
+		ti.syscall_times[i] = p->syscall_times[i];
+	}
+	copyout(p->pagetable, va, (char *)&ti, sizeof(ti));
+	return 0;
+}
 
 extern char trap_page[];
 
 void syscall()
 {
-	struct trapframe *trapframe = curr_proc()->trapframe;
+	struct proc *curr = curr_proc();
+	struct trapframe *trapframe = curr->trapframe;
 	int id = trapframe->a7, ret;
 	uint64 args[6] = { trapframe->a0, trapframe->a1, trapframe->a2,
 			   trapframe->a3, trapframe->a4, trapframe->a5 };
@@ -66,6 +78,13 @@ void syscall()
 	/*
 	* LAB1: you may need to update syscall counter for task info here
 	*/
+	if (id >= MAX_SYSCALL_NUM) {
+		errorf("syscall err id: %d", id);
+		ret = -1;
+		goto OUT;
+	}
+	curr->syscall_times[id]++;
+
 	switch (id) {
 	case SYS_write:
 		ret = sys_write(args[0], args[1], args[2]);
@@ -77,15 +96,20 @@ void syscall()
 		ret = sys_sched_yield();
 		break;
 	case SYS_gettimeofday:
-		ret = sys_gettimeofday((TimeVal *)args[0], args[1]);
+		ret = sys_gettimeofday(args[0], args[1]);
 		break;
 	/*
 	* LAB1: you may need to add SYS_taskinfo case here
 	*/
+	case SYS_task_info:
+		ret = sys_task_info(args[0]);
+		break;
 	default:
 		ret = -1;
 		errorf("unknown syscall %d", id);
 	}
+
+OUT:
 	trapframe->a0 = ret;
 	tracef("syscall ret %d", ret);
 }

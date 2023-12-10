@@ -28,6 +28,7 @@ struct context {
 
 enum procstate { UNUSED, USED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
+#define MAX_SYSCALL_NUM 500
 // Per-process state
 struct proc {
 	enum procstate state; // Process state
@@ -41,11 +42,26 @@ struct proc {
 	/*
 	* LAB1: you may need to add some new fields here
 	*/
+	uint64 start_cycle;
+	unsigned int syscall_times[MAX_SYSCALL_NUM];
 };
 
 /*
 * LAB1: you may need to define struct for TaskInfo here
 */
+// Be consistent with user mode
+typedef enum {
+	UnInit,
+	Ready,
+	Running,
+	Exited,
+} TaskStatus;
+
+typedef struct {
+	TaskStatus state;
+	unsigned int syscall_times[MAX_SYSCALL_NUM];
+	int time;
+} TaskInfo;
 
 struct proc *curr_proc();
 void exit(int);
