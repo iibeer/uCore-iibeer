@@ -1,7 +1,8 @@
 #ifndef USER_TEST
 #define USER_TEST
 
-int run_tests(const char *tests[], int n)
+#define MAX_TEST_CASE_NAME 20
+int run_tests(const char tests[][MAX_TEST_CASE_NAME], int n)
 {
 	int success = 0;
 	for (int i = 0; i < n; ++i) {

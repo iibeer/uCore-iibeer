@@ -5,7 +5,7 @@
 
 /// 辅助测例，运行所有其他测例。
 
-const char *TESTS[] = {
+const char TESTS[][MAX_TEST_CASE_NAME] = {
 	"ch2b_hello_world\0", "ch2b_power\0",	  //"ch2b_write1\0",
 	"ch3b_sleep\0",	      "ch3b_sleep1\0",	  "ch3b_yield0\0",
 	"ch3b_yield1\0",      "ch3b_yield2\0",	  "ch5b_getpid\0",
@@ -14,15 +14,15 @@ const char *TESTS[] = {
 	"ch4_unmap1\0",
 };
 
-const char *FAILS[] = {
+const char FAILS[][MAX_TEST_CASE_NAME] = {
 	"ch4_mmap1\0",
 	"ch4_mmap2\0",
 };
 
 int main()
 {
-	int nsucc = sizeof(TESTS) / sizeof(char *);
-	int nfail = sizeof(FAILS) / sizeof(char *);
+	int nsucc = sizeof(TESTS) / sizeof(TESTS[0]);
+	int nfail = sizeof(FAILS) / sizeof(FAILS[0]);
 	test(TESTS, nsucc, FAILS, nfail, "ch5 Mergetests passed!");
 	return 0;
 }

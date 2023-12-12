@@ -32,6 +32,7 @@ struct context {
 
 enum procstate { UNUSED, USED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
+#define MAX_SYSCALL_NUM 500
 // Per-process state
 struct proc {
 	enum procstate state; // Process state
@@ -42,10 +43,33 @@ struct proc {
 	struct trapframe *trapframe; // data page for trampoline.S
 	struct context context; // swtch() here to run process
 	uint64 max_page;
+	/*
+	* LAB1: you may need to add some new fields here
+	*/
+	uint64 start_cycle;
+	unsigned int syscall_times[MAX_SYSCALL_NUM];
+
 	struct proc *parent; // Parent process
 	uint64 exit_code;
 	struct file *files[FD_BUFFER_SIZE];
 };
+
+/*
+* LAB1: you may need to define struct for TaskInfo here
+*/
+// Be consistent with user mode
+typedef enum {
+	UnInit,
+	Ready,
+	Running,
+	Exited,
+} TaskStatus;
+
+typedef struct {
+	TaskStatus state;
+	unsigned int syscall_times[MAX_SYSCALL_NUM];
+	int time;
+} TaskInfo;
 
 int cpuid();
 struct proc *curr_proc();
