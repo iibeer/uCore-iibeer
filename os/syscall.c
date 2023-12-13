@@ -6,6 +6,8 @@
 #include "timer.h"
 #include "trap.h"
 
+extern struct sched_algorithm *algorithm;
+
 uint64 sys_write(int fd, uint64 va, uint len)
 {
 	debugf("sys_write fd = %d str = %x, len = %d", fd, va, len);
@@ -194,7 +196,8 @@ uint64 sys_spawn(uint64 va)
 	debugf("load proc %s: %d", name, np->pid);
 	np->parent = p;
 	loader(id, np);
-	add_task(np);
+	//add_task(np);
+	algorithm->push_queue(np);
 
 	return np->pid;
 }

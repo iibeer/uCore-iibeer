@@ -1,11 +1,13 @@
 #include "loader.h"
 #include "defs.h"
 #include "trap.h"
+#include "sched_framework.h"
 
 static int app_num;
 static uint64 *app_info_ptr;
 extern char _app_num[], _app_names[], INIT_PROC[];
 char names[MAX_APP_NUM][MAX_STR_LEN];
+extern struct sched_algorithm *algorithm;
 
 // Get user progs' infomation through pre-defined symbol in `link_app.S`
 void loader_init()
@@ -97,6 +99,8 @@ int load_init_app()
 	}
 	debugf("load init proc %s", INIT_PROC);
 	loader(id, p);
-	add_task(p);
+	//add_task(p);
+	algorithm->push_queue(p);
+
 	return 0;
 }

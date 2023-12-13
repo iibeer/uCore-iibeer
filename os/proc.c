@@ -13,7 +13,10 @@ __attribute__((aligned(4096))) char trapframe[NPROC][TRAP_PAGE_SIZE];
 extern char boot_stack_top[];
 struct proc *current_proc;
 struct proc idle;
-struct queue task_queue;
+//struct queue task_queue;
+
+extern struct sched_algorithm algorithm_fcfs;
+struct sched_algorithm *algorithm = &algorithm_fcfs;
 
 int threadid()
 {
@@ -37,7 +40,8 @@ void proc_init()
 	idle.kstack = (uint64)boot_stack_top;
 	idle.pid = IDLE_PID;
 	current_proc = &idle;
-	init_queue(&task_queue);
+	//init_queue(&task_queue);
+	algorithm->init();
 }
 
 int allocpid()
@@ -46,22 +50,22 @@ int allocpid()
 	return PID++;
 }
 
-struct proc *fetch_task()
-{
-	int index = pop_queue(&task_queue);
-	if (index < 0) {
-		debugf("No task to fetch\n");
-		return NULL;
-	}
-	debugf("fetch task %d(pid=%d) to task queue\n", index, pool[index].pid);
-	return pool + index;
-}
+// struct proc *fetch_task()
+// {
+// 	int index = pop_queue(&task_queue);
+// 	if (index < 0) {
+// 		debugf("No task to fetch\n");
+// 		return NULL;
+// 	}
+// 	debugf("fetch task %d(pid=%d) to task queue\n", index, pool[index].pid);
+// 	return pool + index;
+// }
 
-void add_task(struct proc *p)
-{
-	push_queue(&task_queue, p - pool);
-	debugf("add task %d(pid=%d) to task queue\n", p - pool, p->pid);
-}
+// void add_task(struct proc *p)
+// {
+// 	push_queue(&task_queue, p - pool);
+// 	debugf("add task %d(pid=%d) to task queue\n", p - pool, p->pid);
+// }
 
 // Look in the process table for an UNUSED proc.
 // If found, initialize state required to run in the kernel.
@@ -120,7 +124,8 @@ void scheduler()
 		if(has_proc == 0) {
 			panic("all app are over!\n");
 		}*/
-		p = fetch_task();
+		//p = fetch_task();
+		p = algorithm->pick_next();
 		if (p == NULL) {
 			panic("all app are over!\n");
 		}
@@ -156,7 +161,8 @@ void sched()
 void yield()
 {
 	current_proc->state = RUNNABLE;
-	add_task(current_proc);
+	//add_task(current_proc);
+	algorithm->push_queue(current_proc);
 	sched();
 }
 
@@ -196,7 +202,8 @@ int fork()
 	np->trapframe->a0 = 0;
 	np->parent = p;
 	np->state = RUNNABLE;
-	add_task(np);
+	//add_task(np);
+	algorithm->push_queue(np);
 	return np->pid;
 }
 
@@ -238,7 +245,8 @@ int wait(int pid, int *code)
 			return -1;
 		}
 		p->state = RUNNABLE;
-		add_task(p);
+		//add_task(p);
+		algorithm->push_queue(p);
 		sched();
 	}
 }

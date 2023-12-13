@@ -11,6 +11,7 @@
 #include "string.h"
 #include "types.h"
 #include "vm.h"
+#include "sched_framework.h"
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x) / sizeof((x)[0]))
