@@ -24,6 +24,7 @@ const int MOD = 10007;
 
 int main()
 {
+	puts("......ch2b_power start......");
 	int pow[10] = {};
 	int index = 0;
 	int i, last;
@@ -37,5 +38,6 @@ int main()
 		}
 	}
 	puts("Test power OK!");
+	puts("......ch2b_power finish......");
 	return 0;
 }

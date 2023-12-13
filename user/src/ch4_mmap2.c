@@ -9,6 +9,7 @@
 
 int main()
 {
+	puts("......ch4_mmap2 start......");
 	uint64 start = 0x10000000;
 	uint64 len = 4096;
 	int prot = 2;
@@ -17,5 +18,6 @@ int main()
 	// *addr = (uint8)start; // can't write, R, 0 && W, 1 is illegal in riscv
 	assert(*addr != 0);
 	puts("Should cause error, Test 04_2 fail!");
+	puts("......ch4_mmap2 finish......");
 	return 0;
 }

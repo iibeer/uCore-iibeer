@@ -11,6 +11,7 @@
 
 int main()
 {
+	puts("......ch5_spawn1 start......");
 	int cpid = spawn("ch5_exit0\0");
 	assert(cpid >= 0); // "child pid invalid"
 	printf("new child %d\n", cpid);
@@ -33,5 +34,6 @@ int main()
 	assert_eq(exit_code, getpid()); // "error exit code"
 	puts("Test ppid OK!");
 	puts("Test waitpid OK!");
+	puts("......ch5_spawn1 finish......");
 	return 0;
 }

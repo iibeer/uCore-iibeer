@@ -10,6 +10,7 @@ const int MAX_CHILD = 40;
 
 int main()
 {
+	puts("......ch5_spawn0 start......");
 	for (int _ = 0; _ < MAX_CHILD; ++_) {
 		int cpid = spawn("ch5b_getpid\0");
 		assert(cpid >= 0); // "child pid invalid"
@@ -22,5 +23,6 @@ int main()
 	}
 	assert(wait(&exit_code) < 0); // "wait got too many"
 	puts("Test many spawn OK!");
+	puts("......ch5_spawn0 finish......");
 	return 0;
 }

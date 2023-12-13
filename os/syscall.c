@@ -175,10 +175,28 @@ uint64 sys_wait(int pid, uint64 va)
 	return wait(pid, code);
 }
 
+extern int loader(int app_id, struct proc *p);
 uint64 sys_spawn(uint64 va)
 {
 	// TODO: your job is to complete the sys call
-	return -1;
+	struct proc *p = curr_proc();
+	char *name = (char *)useraddr(p->pagetable, va);
+	int id = get_id_by_name(name);
+	if (id < 0) {
+		errorf("sys_spawn: can't find proc: %s", name);
+		return -1;
+	}
+	struct proc *np = allocproc();
+	if (np == NULL) {
+		errorf("sys_spawn: allocproc\n");
+		return -1;
+	}
+	debugf("load proc %s: %d", name, np->pid);
+	np->parent = p;
+	loader(id, np);
+	add_task(np);
+
+	return np->pid;
 }
 
 /*

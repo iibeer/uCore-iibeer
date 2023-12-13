@@ -9,6 +9,7 @@
 
 int main()
 {
+	puts("......ch4_mmap1 start......");
 	uint64 start = 0x10000000;
 	uint64 len = 4096;
 	int prot = 1;
@@ -16,5 +17,6 @@ int main()
 	uint8 *addr = (uint8 *)start;
 	*addr = (uint8)start;
 	puts("Should cause error, Test 04_1 fail!");
+	puts("......ch4_mmap1 finish......");
 	return 0;
 }

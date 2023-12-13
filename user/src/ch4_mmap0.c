@@ -9,6 +9,7 @@
 
 int main()
 {
+	puts("......ch4_mmap0 start......");
 	uint64 start = 0x10000000;
 	uint64 len = 4096;
 	int prot = 3;
@@ -22,5 +23,6 @@ int main()
 		assert_eq(*addr, (uint8)i);
 	}
 	puts("Test 04_0 OK!");
+	puts("......ch4_mmap0 finish......");
 	return 0;
 }

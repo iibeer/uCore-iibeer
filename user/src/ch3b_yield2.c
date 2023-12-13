@@ -10,6 +10,7 @@ const int HEIGHT = 5;
 
 int main()
 {
+	puts("......ch3b_yield2 start......");
 	for (int i = 0; i < HEIGHT; ++i) {
 		char buf[WIDTH + 1];
 		for (int j = 0; j < WIDTH; ++j)
@@ -19,5 +20,6 @@ int main()
 		sched_yield();
 	}
 	puts("Test write B OK!");
+	puts("......ch3b_yield2 finish......");
 	return 0;
 }

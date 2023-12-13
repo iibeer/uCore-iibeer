@@ -8,11 +8,13 @@
 
 int main()
 {
+	puts("......ch5_setprio start......");
 	assert_eq(set_priority(10), 10);
 	assert_eq(set_priority(INT_MAX), INT_MAX);
 	assert_eq(set_priority(0), -1);
 	assert_eq(set_priority(1), -1);
 	assert_eq(set_priority(-10), -1);
 	puts("Test set_priority OK!");
+	puts("......ch5_setprio finish......");
 	return 0;
 }

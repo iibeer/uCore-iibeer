@@ -10,6 +10,7 @@
 
 int main()
 {
+	puts("......ch3b_sleep start......");
 	int64 current_time = get_mtime();
 	assert(current_time > 0);
 	printf("get_time OK! %d\n", current_time);
@@ -18,5 +19,6 @@ int main()
 		sched_yield();
 	}
 	puts("Test sleep OK!");
+	puts("......ch3b_sleep finish......");
 	return 0;
 }

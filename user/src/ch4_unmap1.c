@@ -9,6 +9,7 @@
 
 int main()
 {
+	puts("......ch4_unmap1 start......");
 	uint64 start = 0x10000000;
 	uint64 len = 4096;
 	int prot = 3;
@@ -16,5 +17,6 @@ int main()
 	assert_eq(munmap((void *)start, len + 1), -1);
 	assert_eq(munmap((void *)(start + 1), len - 1), -1);
 	puts("Test 04_5 ummap2 OK!");
+	puts("......ch4_unmap1 finish......");
 	return 0;
 }

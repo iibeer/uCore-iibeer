@@ -12,6 +12,7 @@
 
 int main()
 {
+	puts("......ch3b_sleep1 start......");
 	int64 start = get_mtime();
 	printf("current time_msec = %d\n", start);
 	sleep(100);
@@ -19,5 +20,6 @@ int main()
 	printf("time_msec = %d after sleeping 100 ticks, delta = %dms!\n", end,
 	       end - start);
 	puts("Test sleep1 passed!");
+	puts("......ch3b_sleep1 finish......");
 	return 0;
 }

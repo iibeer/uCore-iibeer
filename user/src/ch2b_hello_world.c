@@ -7,6 +7,8 @@
 
 int main()
 {
+	puts("......ch2b_hello_world start......");
 	puts("Hello world from user mode program!\nTest hello_world OK!");
+	puts("......ch2b_hello_world finish......");
 	return 0;
 }

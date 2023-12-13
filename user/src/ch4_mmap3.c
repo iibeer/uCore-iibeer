@@ -9,6 +9,7 @@
 
 int main()
 {
+	puts("......ch4_mmap3 start......");
 	uint64 start = 0x10000000;
 	uint64 len = 4096;
 	int prot = 3;
@@ -21,5 +22,6 @@ int main()
 	assert_eq(mmap((void *)(start + len), len, prot | 8, MAP_ANONYMOUS, -1),
 		  -1);
 	puts("Test 04_3 test OK!");
+	puts("......ch4_mmap3 finish......");
 	return 0;
 }
